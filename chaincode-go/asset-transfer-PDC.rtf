@@ -1,0 +1,85 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2580
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 AndaleMono;}
+{\colortbl;\red255\green255\blue255;\red49\green49\blue49;\red38\green38\blue38;\red210\green0\blue53;
+}
+{\*\expandedcolortbl;;\cssrgb\c25098\c25098\c25098;\cssrgb\c20000\c20000\c20000;\cssrgb\c86667\c6667\c26667;
+}
+\margl1440\margr1440\vieww26640\viewh15120\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs24 \cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 ./\cf3 \strokec3 network\cf2 \strokec2 .\cf3 \strokec3 sh\cf2 \strokec2  \cf3 \strokec3 up\cf2 \strokec2  \cf3 \strokec3 createChannel\cf2 \strokec2  -\cf3 \strokec3 ca\cf2 \strokec2  -\cf3 \strokec3 s\cf2 \strokec2  \cf3 \strokec3 couchdb\
+\cf2 \strokec2 \
+./\cf3 \strokec3 network\cf2 \strokec2 .\cf3 \strokec3 sh\cf2 \strokec2  \cf3 \strokec3 deployCC\cf2 \strokec2  -\cf3 \strokec3 ccn\cf2 \strokec2  \cf3 \strokec3 private\cf2 \strokec2  -\cf3 \strokec3 ccp\cf2 \strokec2  ../\cf3 \strokec3 asset\cf2 \strokec2 -\cf3 \strokec3 transfer\cf2 \strokec2 -\cf3 \strokec3 private\cf2 \strokec2 -\cf3 \strokec3 data\cf2 \strokec2 /\cf3 \strokec3 chaincode\cf2 \strokec2 -\cf3 \strokec3 go\cf2 \strokec2 / -\cf3 \strokec3 ccl\cf2 \strokec2  \cf3 \strokec3 go\cf2 \strokec2  -\cf3 \strokec3 ccep\cf2 \strokec2  \cf4 \strokec4 "OR('Org1MSP.peer','Org2MSP.peer')"\cf2 \strokec2  -\cf3 \strokec3 cccg\cf2 \strokec2  ../\cf3 \strokec3 asset\cf2 \strokec2 -\cf3 \strokec3 transfer\cf2 \strokec2 -\cf3 \strokec3 private\cf2 \strokec2 -\cf3 \strokec3 data\cf2 \strokec2 /\cf3 \strokec3 chaincode\cf2 \strokec2 -\cf3 \strokec3 go\cf2 \strokec2 /\cf3 \strokec3 collections_config\cf2 \strokec2 .\cf3 \strokec3 json\
+\cf2 \strokec2 \
+export PATH=$\{PWD\}/../bin:$\{PWD\}:$PATH\
+export FABRIC_CFG_PATH=$PWD/../config/\
+\
+export FABRIC_CA_CLIENT_HOME=$\{PWD\}/organizations/peerOrganizations/org1.example.com/\
+\
+fabric-ca-client register --caname ca-org1 --id.name owner --id.secret ownerpw --id.type client --tls.certfiles $\{PWD\}/organizations/fabric-ca/org1/tls-cert.pem\
+\
+fabric-ca-client enroll -u https://owner:ownerpw@localhost:7054 --caname ca-org1 -M $\{PWD\}/organizations/peerOrganizations/org1.example.com/users/owner@org1.example.com/msp --tls.certfiles $\{PWD\}/organizations/fabric-ca/org1/tls-cert.pem\
+\
+cp $\{PWD\}/organizations/peerOrganizations/org1.example.com/msp/config.yaml $\{PWD\}/organizations/peerOrganizations/org1.example.com/users/owner@org1.example.com/msp/config.yaml\
+\
+export FABRIC_CA_CLIENT_HOME=$\{PWD\}/organizations/peerOrganizations/org2.example.com/\
+\
+fabric-ca-client register --caname ca-org2 --id.name buyer --id.secret buyerpw --id.type client --tls.certfiles $\{PWD\}/organizations/fabric-ca/org2/tls-cert.pem\
+\
+fabric-ca-client enroll -u https://buyer:buyerpw@localhost:8054 --caname ca-org2 -M $\{PWD\}/organizations/peerOrganizations/org2.example.com/users/buyer@org2.example.com/msp --tls.certfiles $\{PWD\}/organizations/fabric-ca/org2/tls-cert.pem\
+\
+cp $\{PWD\}/organizations/peerOrganizations/org2.example.com/msp/config.yaml $\{PWD\}/organizations/peerOrganizations/org2.example.com/users/buyer@org2.example.com/msp/config.yaml\
+\
+export PATH=$\{PWD\}/../bin:$PATH\
+export FABRIC_CFG_PATH=$PWD/../config/\
+export CORE_PEER_TLS_ENABLED=true\
+export CORE_PEER_LOCALMSPID="Org1MSP"\
+export CORE_PEER_TLS_ROOTCERT_FILE=$\{PWD\}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt\
+export CORE_PEER_MSPCONFIGPATH=$\{PWD\}/organizations/peerOrganizations/org1.example.com/users/owner@org1.example.com/msp\
+export CORE_PEER_ADDRESS=localhost:7051\
+\
+export ASSET_PROPERTIES=$(echo -n "\{\\"objectType\\":\\"asset\\",\\"assetID\\":\\"asset1\\",\\"color\\":\\"green\\",\\"size\\":20,\\"appraisedValue\\":100\}" | base64 | tr -d \\\\n)\
+peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile $\{PWD\}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem -C mychannel -n private -c '\{"function":"CreateAsset","Args":[]\}' --transient "\{\\"asset_properties\\":\\"$ASSET_PROPERTIES\\"\}"\
+\
+\pard\pardeftab720\partightenfactor0
+\cf3 \strokec3 peer\cf2 \strokec2  \cf3 \strokec3 chaincode\cf2 \strokec2  \cf3 \strokec3 query\cf2 \strokec2  -\cf3 \strokec3 C\cf2 \strokec2  \cf3 \strokec3 mychannel\cf2 \strokec2  -\cf3 \strokec3 n\cf2 \strokec2  \cf3 \strokec3 private\cf2 \strokec2  -\cf3 \strokec3 c\cf2 \strokec2  \cf4 \strokec4 '\{"function":"ReadAsset","Args":["asset1"]\}'\cf2 \strokec2 \
+\
+\cf3 \strokec3 peer\cf2 \strokec2  \cf3 \strokec3 chaincode\cf2 \strokec2  \cf3 \strokec3 query\cf2 \strokec2  -\cf3 \strokec3 C\cf2 \strokec2  \cf3 \strokec3 mychannel\cf2 \strokec2  -\cf3 \strokec3 n\cf2 \strokec2  \cf3 \strokec3 private\cf2 \strokec2  -\cf3 \strokec3 c\cf2 \strokec2  \cf4 \strokec4 '\{"function":"ReadAssetPrivateDetails","Args":["Org1MSPPrivateCollection","asset1"]\}'\cf2 \strokec2 \
+\
+export CORE_PEER_LOCALMSPID="Org2MSP"\
+export CORE_PEER_TLS_ROOTCERT_FILE=$\{PWD\}/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt\
+export CORE_PEER_MSPCONFIGPATH=$\{PWD\}/organizations/peerOrganizations/org2.example.com/users/buyer@org2.example.com/msp\
+export CORE_PEER_ADDRESS=localhost:9051\
+\
+\cf3 \strokec3 peer\cf2 \strokec2  \cf3 \strokec3 chaincode\cf2 \strokec2  \cf3 \strokec3 query\cf2 \strokec2  -\cf3 \strokec3 C\cf2 \strokec2  \cf3 \strokec3 mychannel\cf2 \strokec2  -\cf3 \strokec3 n\cf2 \strokec2  \cf3 \strokec3 private\cf2 \strokec2  -\cf3 \strokec3 c\cf2 \strokec2  \cf4 \strokec4 '\{"function":"ReadAsset","Args":["asset1"]\}'\
+\pard\pardeftab720\partightenfactor0
+\cf2 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+\cf2 peer chaincode query -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile $\{PWD\}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem -C mychannel -n private -c '\{"function":"ReadAssetPrivateDetails","Args":["Org2MSPPrivateCollection","asset1"]\}'\
+\
+\pard\pardeftab720\partightenfactor0
+\cf3 \strokec3 peer\cf2 \strokec2  \cf3 \strokec3 chaincode\cf2 \strokec2  \cf3 \strokec3 query\cf2 \strokec2  -\cf3 \strokec3 C\cf2 \strokec2  \cf3 \strokec3 mychannel\cf2 \strokec2  -\cf3 \strokec3 n\cf2 \strokec2  \cf3 \strokec3 private\cf2 \strokec2  -\cf3 \strokec3 c\cf2 \strokec2  \cf4 \strokec4 '\{"function":"ReadAssetPrivateDetails","Args":["Org1MSPPrivateCollection","asset1"]\}'\cf2 \strokec2 \
+\
+export ASSET_VALUE=$(echo -n "\{\\"assetID\\":\\"asset1\\",\\"appraisedValue\\":100\}" | base64 | tr -d \\\\n)\
+peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile $\{PWD\}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem -C mychannel -n private -c '\{"function":"AgreeToTransfer","Args":[]\}' --transient "\{\\"asset_value\\":\\"$ASSET_VALUE\\"\}"\
+\
+peer chaincode query -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile $\{PWD\}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem -C mychannel -n private -c '\{"function":"ReadAssetPrivateDetails","Args":["Org2MSPPrivateCollection","asset1"]\}'\
+\
+export CORE_PEER_LOCALMSPID="Org1MSP"\
+export CORE_PEER_MSPCONFIGPATH=$\{PWD\}/organizations/peerOrganizations/org1.example.com/users/owner@org1.example.com/msp\
+export CORE_PEER_TLS_ROOTCERT_FILE=$\{PWD\}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt\
+export CORE_PEER_ADDRESS=localhost:7051\
+\
+peer chaincode query -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile $\{PWD\}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem -C mychannel -n private -c '\{"function":"ReadTransferAgreement","Args":["asset1"]\}'\
+\
+export ASSET_OWNER=$(echo -n "\{\\"assetID\\":\\"asset1\\",\\"buyerMSP\\":\\"Org2MSP\\"\}" | base64 | tr -d \\\\n)\
+peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile $\{PWD\}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem -C mychannel -n private -c '\{"function":"TransferAsset","Args":[]\}' --transient "\{\\"asset_owner\\":\\"$ASSET_OWNER\\"\}" --peerAddresses localhost:7051 --tlsRootCertFiles $\{PWD\}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt\
+\
+peer chaincode query -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile $\{PWD\}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem -C mychannel -n private -c '\{"function":"ReadAsset","Args":["asset1"]\}'\
+\
+peer chaincode query -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile $\{PWD\}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem -C mychannel -n private -c '\{"function":"ReadAssetPrivateDetails","Args":["Org1MSPPrivateCollection","asset1"]\}'\
+\pard\pardeftab720\partightenfactor0
+\cf2 \
+}
