@@ -18,8 +18,8 @@ router.post('/', (req, res) => {
             return res.status(500).send(err);
         }
 
-        createAsset.createAsset(res, path).then(assetID => {
-            return res.status(200).send(`Created asset: ${assetID}`);
+        createAsset.createAsset(res, path).then(returnVal => {
+            return res.status(200).send(`Created asset: ${returnVal[0]} with transactionId: ${returnVal[1]}`);
         }).catch(e => {
             // error
             console.log(e);

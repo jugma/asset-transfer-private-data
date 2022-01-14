@@ -21,7 +21,7 @@ router.post('/', (req, res) => {
         let assetID = req.body.assetID;
         let OrgName = req.body.OrgName;
         transferAsset.transferAsset(res, assetID, OrgName, path).then(result => {
-            return res.status(200).send(`Transferred asset: ${assetID}`);
+            return res.status(200).send(`Transferred asset: ${assetID} with transactionId: ${result}`);
         }).catch(e => {
             // error
             console.log(e);

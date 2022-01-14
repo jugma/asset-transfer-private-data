@@ -104,10 +104,13 @@ async function createAsset(res, fileName) {
         let randomNumber = Math.floor(Math.random() * 1000) + 1;
         // use a random key so that we can run multiple times
         let assetID1 = `asset${randomNumber}`;
+        let result;
+        const returnVal = [];
+        let transactionId;
 
         try {
             const assetType = 'ValuableAsset';
-            let result;
+            
             // create a hash and store it in the PDC
             var hashSbom = crypto.createHash('md5').update(dataStrSbom).digest('hex');
             var timeStamp = await createTimeStamp();
@@ -117,6 +120,8 @@ async function createAsset(res, fileName) {
             logger.info('\n**************** As Org1 Client ****************');
             logger.info('Adding Assets to work with:\n--> Submit Transaction: CreateAsset ' + assetID1);
             let statefulTxn = contractOrg1.createTransaction('CreateAsset');
+            transactionId = statefulTxn.getTransactionId();
+
             //if you need to customize endorsement to specific set of Orgs, use setEndorsingOrganizations
             //statefulTxn.setEndorsingOrganizations(mspOrg1);
             let tmapData = Buffer.from(JSON.stringify(asset1Data));
@@ -128,7 +133,9 @@ async function createAsset(res, fileName) {
             // Disconnect from the gateway peer when all work for this client identity is complete
             gatewayOrg1.disconnect();
         }
-        return assetID1;
+        returnVal.push(assetID1);
+        returnVal.push(transactionId);
+        return returnVal;
 
     } catch (error) {
         logger.error(`Error in transaction: ${error}`);

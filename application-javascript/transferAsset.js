@@ -205,12 +205,13 @@ async function transferAsset(res, assetID1, OrgName, fileName) {
         const networkOrg2 = await gatewayOrg2.getNetwork(myChannel);
         const contractOrg2 = networkOrg2.getContract(myChaincodeName);
         contractOrg2.addDiscoveryInterest({ name: myChaincodeName, collectionNames: [memberAssetCollectionName, org2PrivateCollectionName] });
-
+        let result;
+        let transactionId;
+        
         try {
 
             let randomNumber = Math.floor(Math.random() * 1000) + 1;
             // use a random key so that we can run multiple times
-            let result;
 
             logger.info('\n--> Evaluate Transaction: ReadAssetPrivateDetails from ' + org1PrivateCollectionName);
             // ReadAssetPrivateDetails reads data from Org's private collection. Args: collectionName, assetID
@@ -233,6 +234,7 @@ async function transferAsset(res, assetID1, OrgName, fileName) {
             statefulTxn.setTransient({
                 asset_value: tmpData
             });
+            transactionId = statefulTxn.getTransactionId();
             result = await statefulTxn.submit();
 
             logger.info('\n**************** As Org1 Client ****************');
@@ -264,6 +266,7 @@ async function transferAsset(res, assetID1, OrgName, fileName) {
             gatewayOrg1.disconnect();
             gatewayOrg2.disconnect();
         }
+        return transactionId;
 
     } catch (error) {
         logger.error(`Error in transaction: ${error}`);
